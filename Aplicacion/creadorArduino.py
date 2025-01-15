@@ -57,7 +57,7 @@ def generar_codigo_arduino(entradas, expresiones):
     # Evaluar las expresiones
     codigo += "\n  // Evaluar expresiones lógicas\n"
     for salida, expresion in expresiones.items():
-        codigo += f"  {salida} = {expresion};\n"
+        codigo += f"  {salida} = {expresion};\n".replace("~", "!")
     
     # Imprimir resultados
     codigo += "\n  // Imprimir resultados\n"

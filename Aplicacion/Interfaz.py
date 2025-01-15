@@ -23,10 +23,9 @@ def ejecutar_codigo():
         # Ejecutar las funciones con los parámetros ingresados
         print(expresion, denominador, variables, bits, exportar_excel, nombre)
         df = crearCombinatoria(denominador, divisor, variables, bits, exportar_excel, nombre)
-        lista_simplificada = mc.quine_mccluskey(df, variables, bits)
-        #ex.encontrar_expresiones_logicas(df, variables, bits, f"{nombre}_no_simplificado", False)
-        #ex.encontrar_expresiones_logicas(df, variables, bits, f"{nombre}_simplificado", True)
-        exp_lgoicas = ex.quine_mccluskey_con_canonicas(df, variables, bits, "SIMPLIFICADO", lista_simplificada)
+        ex.encontrar_expresiones_logicas(df, variables, bits, f"{nombre}_no_simplificado", False)
+        # exp_lgoicas = ex.encontrar_expresiones_logicas(df, variables, bits, f"{nombre}_simplificado", True)
+        exp_lgoicas = ex.quine_mccluskey_con_canonicas(df, variables, bits, "SIMPLIFICADO", mc.quine_mccluskey(df, variables, bits))
         ca.crear_archivo_arduino(nombre, nombre, variables, exp_lgoicas, bits)
         messagebox.showinfo("Éxito", "Operación completada correctamente.")
     except Exception as e:
