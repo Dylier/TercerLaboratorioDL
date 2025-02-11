@@ -1,4 +1,4 @@
-// C√≥digo generado automaticamente
+// CÛdigo generado automaticamente
 #include <Arduino.h>
 
 // Declaracion de variables
@@ -32,9 +32,9 @@ void loop() {
   B_1 = obtenerValor("B_1");
   B_2 = obtenerValor("B_2");
 
-  // Evaluar expresiones l√≥gicas
-  SC = (A_0 & A_1 & B_0) | (A_0 & A_2 & B_0) | (A_0 & B_0 & B_1) | (A_0 & B_0 & B_2) | (A_0 & B_1 & B_2) | (A_1 & A_2 & B_0) | (A_1 & B_0 & B_1) | (A_1 & B_0 & B_2) | (A_0 & B_0 & !A_1) | (A_0 & B_0 & !A_2) | (A_0 & B_0 & !B_1) | (A_0 & B_0 & !B_2) | (A_1 & B_0 & !A_0) | (A_1 & B_0 & !A_2) | (A_1 & B_0 & !B_1) | (A_1 & B_0 & !B_2) | (A_1 & A_2 & B_1 & B_2);
-  SR = (A_0 & B_1 & !A_1) | (A_0 & B_1 & !B_0) | (A_0 & A_1 & B_0 & !B_1) | (A_0 & A_2 & B_0 & !B_2) | (A_0 & A_2 & B_1 & !B_2) | (A_0 & B_0 & B_2 & !A_2) | (A_0 & B_1 & B_2 & !A_2) | (A_1 & A_2 & B_0 & !B_1) | (A_1 & B_0 & B_2 & !A_0) | (A_1 & B_0 & B_2 & !A_2) | (A_1 & B_0 & B_2 & !B_1) | (A_1 & B_1 & B_2 & !A_2) | (A_1 & A_2 & B_1 & !B_0 & !B_2);
+  // Evaluar expresiones lÛgicas
+  SC = (A_2 & !A_0 & !A_1) | (A_0 & !B_0 & !B_1 & !B_2) | (A_1 & !B_0 & !B_1 & !B_2) | (A_2 & !B_0 & !B_1 & !B_2);
+  SR = (A_0 & B_2 & !B_0 & !B_1) | (A_1 & B_2 & !B_0 & !B_1);
   I = (B_0 & !A_0 & !A_1 & !A_2) | (B_1 & !A_0 & !A_1 & !A_2) | (B_2 & !A_0 & !A_1 & !A_2) | (!A_0 & !A_1 & !A_2 & !B_0) | (!A_0 & !A_1 & !A_2 & !B_1) | (!A_0 & !A_1 & !A_2 & !B_2);
   C_0 = (A_0 & A_1 & B_0 & B_1) | (A_0 & B_0 & B_1 & B_2);
   C_1 = (A_0 & B_0 & !B_1) | (A_1 & B_0 & B_1 & !A_0) | (A_0 & B_0 & !A_1 & !B_2) | (A_1 & A_2 & B_0 & B_2 & !A_0) | (A_1 & A_2 & B_0 & B_2 & !B_1);
@@ -66,6 +66,6 @@ bool obtenerValor(String nombre) {
     char input = Serial.read();
     if (input == '0') return false;
     if (input == '1') return true;
-    Serial.println("Entrada inv√°lida. Por favor ingresa 0 o 1.");
+    Serial.println("Entrada inv·lida. Por favor ingresa 0 o 1.");
   }
 }

@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 from CombinatoriaBinaria import crearCombinatoria
-import metodoQuineMcCluskey as mc
+# import metodoQuineMcCluskey as mc
+import quine as mc
 import ExpresionLogica as ex
 import creadorArduino as ca
 

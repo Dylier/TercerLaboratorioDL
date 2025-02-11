@@ -1,11 +1,8 @@
 import pandas as pd
 import numpy as np
-from typing import List, Dict, Tuple
-import time as t
+from typing import List, Tuple, Union
+from sympy import symbols, Not, And, Or
 
-def guardar_en_archivo(texto: str, nombre_archivo: str = "resultado_1.txt"):
-    with open(nombre_archivo, "a") as archivo:
-        archivo.write(texto + "\n")
 
 def generar_columnas_entrada(variables: List[str], bits_por_var: int) -> List[str]:
     columnas = []
@@ -39,6 +36,32 @@ def encontrar_diferencia_un_bit(bin1: str, bin2: str) -> Tuple[bool, str]:
             
     return diferencias == 1, resultado
 
+def convertir_termino_a_expresion(termino: str, variables: List[str], bits_por_var: int) -> List[Union[symbols, Not]]:
+    simbolos = []
+    nombre_columnas = [f"{var}_{bit}" for var in variables for bit in range(bits_por_var)]
+    
+    for col, bit in zip(nombre_columnas, termino):
+        if bit != '_':
+            sym = symbols(col)
+            simbolos.append(sym if bit == '1' else Not(sym))
+    
+    return simbolos
+
+def generar_expresion_canonica(df_simplificado: pd.DataFrame, variables: List[str], bits_por_var: int) -> str:
+    if df_simplificado.empty:
+        return "0"
+        
+    terminos = []
+    for _, fila in df_simplificado.iterrows():
+        simbolos = convertir_termino_a_expresion(fila['binario'], variables, bits_por_var)
+        if simbolos:
+            terminos.append(And(*simbolos))
+    
+    return str(Or(*terminos)) if terminos else "0"
+
+
+
+
 def identificar_salidas_interes(df: pd.DataFrame) -> List[str]:
     salidas = []
     for col in df.columns:
@@ -65,7 +88,7 @@ def simplificar_grupos(df: pd.DataFrame) -> pd.DataFrame:
     simplificados = []
     usados = set()
     
-    guardar_en_archivo("\nComparaciones entre términos:")
+    print("\nComparaciones entre terminos:")
     
     for i, fila1 in df.iterrows():
         for j, fila2 in df.iterrows():
@@ -78,10 +101,10 @@ def simplificar_grupos(df: pd.DataFrame) -> pd.DataFrame:
             combinable, combinado = encontrar_diferencia_un_bit(
                 fila1['binario'], fila2['binario'])
             
-            guardar_en_archivo(f"Comparando {fila1['binario']} ({fila1['minterms']}) con {fila2['binario']} ({fila2['minterms']})")
+            print(f"Comparando {fila1['binario']} ({fila1['minterms']}) con {fila2['binario']} ({fila2['minterms']})")
             
             if combinable:
-                guardar_en_archivo(f" -> Se pueden agrupar: {fila1['binario']} y {fila2['binario']} -> {combinado}")
+                print(f" -> Se pueden agrupar: {fila1['binario']} y {fila2['binario']} -> {combinado}")
                 usados.add(fila1['minterms'])
                 usados.add(fila2['minterms'])
                 nuevos_minterms = ','.join(sorted([fila1['minterms'], fila2['minterms']]))
@@ -90,7 +113,7 @@ def simplificar_grupos(df: pd.DataFrame) -> pd.DataFrame:
                     'binario': combinado
                 })
             else:
-                guardar_en_archivo(" -> No se pueden agrupar")
+                print(" -> No se pueden agrupar")
     
     for _, fila in df.iterrows():
         if fila['minterms'] not in usados:
@@ -108,6 +131,7 @@ def simplificar_grupos(df: pd.DataFrame) -> pd.DataFrame:
         
     return resultado.sort_values('cant_unos')
 
+
 def quine_mccluskey(df: pd.DataFrame, variables: List[str], 
                     bits_por_var: int) -> List[pd.DataFrame]:
     columnas_entrada = generar_columnas_entrada(variables, bits_por_var)
@@ -115,25 +139,34 @@ def quine_mccluskey(df: pd.DataFrame, variables: List[str],
     resultados_finales = []
     
     for salida in salidas:
-        guardar_en_archivo(f"\nProcesando salida: {salida}")
+        print(f"\nProcesando salida: {salida}")
         
+        # Crear grupos iniciales
         df_actual = preparar_grupos_iniciales(df, salida, columnas_entrada)
-        guardar_en_archivo("\nGrupos iniciales:")
-        guardar_en_archivo(str(df_actual))
+        print("\nGrupos iniciales:")
+        print(df_actual)
         
         iteracion = 1
         longitud_anterior = -1
         
+        # Iterar hasta que no haya más simplificaciones posibles
         while len(df_actual) != longitud_anterior:
             longitud_anterior = len(df_actual)
             df_actual = simplificar_grupos(df_actual)
             
-            if len(df_actual) > 0:
-                guardar_en_archivo(f"\nIteración {iteracion}:")
-                guardar_en_archivo(str(df_actual))
+            if len(df_actual) > 0 and iteracion < 3:
+                print(f"\nIteración {iteracion}:")
+                print(df_actual)
                 iteracion += 1
             else:
                 break
         
         resultados_finales.append(df_actual)
+        
+    for resultado, salida in zip(resultados_finales, salidas):
+        print(f"\n\nExpresiones logicas finales de {salida}\n\n")
+        expresion_logica = generar_expresion_canonica(resultado, variables, bits_por_var)
+        print(resultado)
+        print(f"Expresion logica: {expresion_logica}")
+    
     return resultados_finales
